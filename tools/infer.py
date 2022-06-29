@@ -3,7 +3,10 @@
 import argparse
 import os
 import sys
+import wandb
 import os.path as osp
+from pathlib import Path
+from typing import Optional
 
 import torch
 
@@ -34,6 +37,8 @@ def get_args_parser(add_help=True):
     parser.add_argument('--hide-labels', default=False, action='store_true', help='hide labels.')
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences.')
     parser.add_argument('--half', action='store_true', help='whether to use FP16 half-precision inference.')
+    parser.add_argument('--wandb_project', type=str, default=None, help='Name of Weights & Biases Project.')
+    parser.add_argument('--wandb_entity', type=str, default=None, help='Name of Weights & Biases Entity.')
 
     args = parser.parse_args()
     LOGGER.info(args)
@@ -57,6 +62,8 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         hide_labels=False,
         hide_conf=False,
         half=False,
+        wandb_project: Optional[str] = None,
+        wandb_entity: Optional[str] = None
         ):
     """ Inference process
 
@@ -90,13 +97,37 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         LOGGER.warning('Save directory already existed')
     if save_txt:
         os.mkdir(osp.join(save_dir, 'labels'))
+    
+    if wandb_project is not None:
+        wandb.init(project=wandb_project, name=name, entity=wandb_entity)
+        config = wandb.config
 
+        config.weights = Path(weights).name
+        config.source = source
+        config.yaml = yaml
+        config.img_size = img_size
+        config.conf_thres = conf_thres
+        config.iou_thres = iou_thres
+        config.max_det = max_det
+        config.device = device
+        config.save_txt = save_txt
+        config.save_img = save_img
+        config.classes = classes
+        config.agnostic_nms = agnostic_nms
+        config.hide_labels = hide_labels
+        config.hide_conf = hide_conf
+        config.half = half
+
+    
     # Inference
     inferer = Inferer(source, weights, device, yaml, img_size, half)
     inferer.infer(conf_thres, iou_thres, classes, agnostic_nms, max_det, save_dir, save_txt, save_img, hide_labels, hide_conf)
 
     if save_txt or save_img:
         LOGGER.info(f"Results saved to {save_dir}")
+    
+    if wandb.run is not None:
+        wandb.finish()
 
 
 def main(args):
