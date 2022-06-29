@@ -95,7 +95,7 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
 
     # Initialize Weights & Biases
 
-    if not osp.isfile(weights) or not osp.isfile(weights + ".pt"):
+    if not osp.isfile(weights) and not osp.isfile(weights + ".pt"):
         try:
             print("Downloading weights...")
             weights = wget.download(f"https://github.com/meituan/YOLOv6/releases/download/0.1.0/{weights}.pt")
