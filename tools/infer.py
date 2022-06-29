@@ -102,6 +102,8 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
             print("\nDone.")
         except urllib.error.HTTPError:
             print("Unable to download model.")
+    elif osp.isfile(weights + ".pt"):
+        weights +=  ".pt"
     
     if not osp.isfile(source) and not osp.isdir(source):
         try:
