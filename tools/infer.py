@@ -97,7 +97,7 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
     if not osp.isfile(weights):
         print("Downloading weights...")
         weights = wget.download(f"https://github.com/meituan/YOLOv6/releases/download/0.1.0/{weights}.pt")
-        print("Done.")
+        print("\nDone.")
 
     if wandb_project is not None:
         wandb.init(project=wandb_project, name=name if name is not None else None, entity=wandb_entity)
