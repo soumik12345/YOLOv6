@@ -3,6 +3,7 @@
 import argparse
 import os
 import sys
+import wget
 import wandb
 import os.path as osp
 from pathlib import Path
@@ -43,6 +44,7 @@ def get_args_parser(add_help=True):
     args = parser.parse_args()
     LOGGER.info(args)
     return args
+
 
 @torch.no_grad()
 def run(weights=osp.join(ROOT, 'yolov6s.pt'),
@@ -91,6 +93,12 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
     """
 
     # Initialize Weights & Biases
+
+    if not osp.isfile(weights):
+        print("Downloading weights...")
+        weights = wget.download(f"https://github.com/meituan/YOLOv6/releases/download/0.1.0/{model_alias}.pt")
+        print("Done.")
+
     if wandb_project is not None:
         wandb.init(project=wandb_project, name=name if name is not None else None, entity=wandb_entity)
         
@@ -116,7 +124,6 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
     elif name is None:
         raise ValueError("`name` must be explicitly specified in case `wandb_project` is None.")
 
-
     # create save dir
     save_dir = osp.join(project, name)
     if (save_img or save_txt) and not osp.exists(save_dir):
@@ -125,7 +132,6 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         LOGGER.warning('Save directory already existed')
     if save_txt:
         os.mkdir(osp.join(save_dir, 'labels'))
-
     
     # Inference
     inferer = Inferer(source, weights, device, yaml, img_size, half)
