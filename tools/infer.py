@@ -5,6 +5,7 @@ import os
 import sys
 import wget
 import wandb
+import urllib
 import os.path as osp
 from pathlib import Path
 from typing import Optional
@@ -95,9 +96,20 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
     # Initialize Weights & Biases
 
     if not osp.isfile(weights):
-        print("Downloading weights...")
-        weights = wget.download(f"https://github.com/meituan/YOLOv6/releases/download/0.1.0/{weights}.pt")
-        print("\nDone.")
+        try:
+            print("Downloading weights...")
+            weights = wget.download(f"https://github.com/meituan/YOLOv6/releases/download/0.1.0/{weights}.pt")
+            print("\nDone.")
+        except urllib.error.HTTPError:
+            print("Unable to download model.")
+    
+    if not osp.isfile(source) and not osp.isdir(source):
+        try:
+            print("Downloading image...")
+            weights = wget.download(source)
+            print("\nDone.")
+        except urllib.error.HTTPError:
+            print("Unable to download image.")
 
     if wandb_project is not None:
         wandb.init(project=wandb_project, name=name if name is not None else None, entity=wandb_entity)
