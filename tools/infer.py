@@ -33,7 +33,7 @@ def get_args_parser(add_help=True):
     parser.add_argument('--classes', nargs='+', type=int, help='filter by classes, e.g. --classes 0, or --classes 0 2 3.')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS.')
     parser.add_argument('--project', default='runs/inference', help='save inference results to project/name.')
-    parser.add_argument('--name', default='exp', help='save inference results to project/name.')
+    parser.add_argument('--name', type=lambda x : None if x == 'None' else str(x), nargs='?', default=None, help='save inference results to project/name.')
     parser.add_argument('--hide-labels', default=False, action='store_true', help='hide labels.')
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences.')
     parser.add_argument('--half', action='store_true', help='whether to use FP16 half-precision inference.')
@@ -89,19 +89,15 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         hide_conf: Hide confidences
         half: Use FP16 half-precision inference, e.g. False
     """
-    # create save dir
-    save_dir = osp.join(project, name)
-    if (save_img or save_txt) and not osp.exists(save_dir):
-        os.makedirs(save_dir)
-    else:
-        LOGGER.warning('Save directory already existed')
-    if save_txt:
-        os.mkdir(osp.join(save_dir, 'labels'))
-    
-    if wandb_project is not None:
-        wandb.init(project=wandb_project, name=name, entity=wandb_entity)
-        config = wandb.config
 
+    # Initialize Weights & Biases
+    if wandb_project is not None:
+        wandb.init(project=wandb_project, name=name if name is not None else None, entity=wandb_entity)
+        
+        if name is None:
+            name = wandb.run.name
+        
+        config = wandb.config
         config.weights = Path(weights).name
         config.source = source
         config.yaml = yaml
@@ -117,6 +113,16 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         config.hide_labels = hide_labels
         config.hide_conf = hide_conf
         config.half = half
+
+
+    # create save dir
+    save_dir = osp.join(project, name)
+    if (save_img or save_txt) and not osp.exists(save_dir):
+        os.makedirs(save_dir)
+    else:
+        LOGGER.warning('Save directory already existed')
+    if save_txt:
+        os.mkdir(osp.join(save_dir, 'labels'))
 
     
     # Inference
