@@ -106,7 +106,7 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
     if not osp.isfile(source) and not osp.isdir(source):
         try:
             print("Downloading image...")
-            weights = wget.download(source)
+            source = wget.download(source)
             print("\nDone.")
         except urllib.error.HTTPError:
             print("Unable to download image.")
