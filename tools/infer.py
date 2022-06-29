@@ -113,6 +113,8 @@ def run(weights=osp.join(ROOT, 'yolov6s.pt'),
         config.hide_labels = hide_labels
         config.hide_conf = hide_conf
         config.half = half
+    elif name is None:
+        raise ValueError("`name` must be explicitly specified in case `wandb_project` is None.")
 
 
     # create save dir
