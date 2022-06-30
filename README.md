@@ -38,6 +38,12 @@ First, download a pretrained model from the YOLOv6 [release](https://github.com/
 Second, run inference with `tools/infer.py`
 
 ```shell
+python tools/infer.py --weights <yolov6s-or-yolov6n> --source img.jpg / imgdir
+```
+
+You can also log the infernce results on [Weights & Biases](wandb.ai/site) using just 2 additional parameters 
+
+```shell
 python tools/infer.py --weights <yolov6s-or-yolov6n> --source img.jpg / imgdir --wandb_project <wandb-project-name> --wandb_entity <wandb-entity>
 ```
 

@@ -166,8 +166,6 @@ def run(
         half: Use FP16 half-precision inference, e.g. False
     """
 
-    # Initialize Weights & Biases
-
     if not osp.isfile(weights) and not osp.isfile(weights + ".pt"):
         try:
             print("Downloading weights...")
@@ -188,6 +186,7 @@ def run(
         except urllib.error.HTTPError:
             print("Unable to download image.")
 
+    # Initialize Weights & Biases
     if wandb_project is not None:
         wandb.init(
             project=wandb_project,
