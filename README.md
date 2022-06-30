@@ -38,8 +38,7 @@ First, download a pretrained model from the YOLOv6 [release](https://github.com/
 Second, run inference with `tools/infer.py`
 
 ```shell
-python tools/infer.py --weights yolov6s.pt --source img.jpg / imgdir
-                                yolov6n.pt
+python tools/infer.py --weights <yolov6s-or-yolov6n> --source img.jpg / imgdir --wandb_project <wandb-project-name> --wandb_entity <wandb-entity>
 ```
 
 ### Training
