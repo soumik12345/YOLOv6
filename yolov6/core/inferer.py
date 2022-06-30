@@ -3,6 +3,7 @@
 import os
 import os.path as osp
 import math
+from pathlib import Path
 from typing import Optional
 
 from tqdm import tqdm
@@ -135,7 +136,7 @@ class Inferer:
                 ).round()
 
                 if isinstance(self.inference_logger, WandbInferenceLogger):
-                    self.inference_logger.in_infer(np.array(img_ori), reversed(det))
+                    self.inference_logger.in_infer(np.array(img_ori), save_path, reversed(det))
 
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
@@ -173,6 +174,8 @@ class Inferer:
                 # Save results (image with detections)
                 if save_img:
                     cv2.imwrite(save_path, img_src)
+        
+        self.inference_logger.on_infer_end()
 
     @staticmethod
     def precess_image(path, img_size, stride, half):

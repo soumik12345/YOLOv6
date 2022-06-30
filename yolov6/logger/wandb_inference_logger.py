@@ -5,15 +5,24 @@ import wandb
 class WandbInferenceLogger:
     def __init__(self) -> None:
         self.label_dictionary = {}
+        self.table = wandb.Table(
+            columns=[
+                "Image-File",
+                "Predictions",
+                "Number-of-Objects",
+                "Prediction-Confidence",
+            ]
+        )
 
     def set_label_dictionary(self, label_dictionary):
         self.label_dictionary = label_dictionary
 
-    def in_infer(self, image, detection_results):
-        bbox_data = []
+    def in_infer(self, image, image_file, detection_results):
+        bbox_data, confidences = [], []
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         height, width, _ = image.shape
         for *xyxy, confidence, class_id in detection_results:
+            confidences.append(float(confidence))
             xyxy = [int(coord) for coord in xyxy]
             bbox_data.append(
                 {
@@ -28,16 +37,20 @@ class WandbInferenceLogger:
                     "scores": {"confidence": float(confidence)},
                 }
             )
-        wandb.log(
-            {
-                "Inference Results": wandb.Image(
-                    image,
-                    boxes={
-                        "predictions": {
-                            "box_data": bbox_data,
-                            "class_labels": self.label_dictionary,
-                        }
-                    },
-                )
-            }
+        self.table.add_data(
+            image_file,
+            wandb.Image(
+                image,
+                boxes={
+                    "predictions": {
+                        "box_data": bbox_data,
+                        "class_labels": self.label_dictionary,
+                    }
+                },
+            ),
+            len(detection_results),
+            confidences,
         )
+
+    def on_infer_end(self):
+        wandb.log({"Inference": self.table})
