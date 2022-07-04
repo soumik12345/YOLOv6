@@ -1,4 +1,6 @@
+from pathlib import Path
 import wandb
+from pathlib import Path
 
 
 class WandbInferenceLogger:
@@ -36,7 +38,7 @@ class WandbInferenceLogger:
                 }
             )
         self.table.add_data(
-            image_file,
+            Path(image_file).stem,
             wandb.Image(
                 image_file,
                 boxes={
