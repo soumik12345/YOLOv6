@@ -1,4 +1,3 @@
-import cv2
 import wandb
 
 
@@ -19,7 +18,6 @@ class WandbInferenceLogger:
 
     def in_infer(self, image, image_file, detection_results):
         bbox_data, confidences = [], []
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         height, width, _ = image.shape
         for idx, (*xyxy, confidence, class_id) in enumerate(detection_results):
             confidences.append(float(confidence))
@@ -40,7 +38,7 @@ class WandbInferenceLogger:
         self.table.add_data(
             image_file,
             wandb.Image(
-                image,
+                image_file,
                 boxes={
                     "predictions": {
                         "box_data": bbox_data,

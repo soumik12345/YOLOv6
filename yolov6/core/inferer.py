@@ -136,7 +136,7 @@ class Inferer:
                 ).round()
 
                 if isinstance(self.inference_logger, WandbInferenceLogger):
-                    self.inference_logger.in_infer(np.array(img_ori), save_path, reversed(det))
+                    self.inference_logger.in_infer(np.array(img_ori), img_path, reversed(det))
 
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
