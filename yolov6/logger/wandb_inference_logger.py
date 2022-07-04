@@ -5,7 +5,7 @@ from pathlib import Path
 
 class WandbInferenceLogger:
     def __init__(self) -> None:
-        self.label_dictionary = {}
+        self._label_dictionary = {}
         self.table = wandb.Table(
             columns=[
                 "Image-File",
@@ -15,8 +15,13 @@ class WandbInferenceLogger:
             ]
         )
 
-    def set_label_dictionary(self, label_dictionary):
-        self.label_dictionary = label_dictionary
+    @property
+    def label_dictionary(self):
+        return self._label_dictionary
+
+    @label_dictionary.setter
+    def label_dictionary(self, new_dict):
+        self._label_dictionary = new_dict
 
     def in_infer(self, image, image_file, detection_results):
         bbox_data, confidences = [], []

@@ -49,9 +49,9 @@ class Inferer:
         self.stride = self.model.stride
         self.class_names = load_yaml(yaml)["names"]
         if self.inference_logger is not None:
-            self.inference_logger.set_label_dictionary(
-                {idx: self.class_names[idx] for idx in range(len(self.class_names))}
-            )
+            self.inference_logger.label_dictionary = {
+                idx: self.class_names[idx] for idx in range(len(self.class_names))
+            }
         self.img_size = self.check_img_size(
             self.img_size, s=self.stride
         )  # check image size
@@ -136,7 +136,9 @@ class Inferer:
                 ).round()
 
                 if isinstance(self.inference_logger, WandbInferenceLogger):
-                    self.inference_logger.in_infer(np.array(img_ori), img_path, reversed(det))
+                    self.inference_logger.in_infer(
+                        np.array(img_ori), img_path, reversed(det)
+                    )
 
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
@@ -174,7 +176,7 @@ class Inferer:
                 # Save results (image with detections)
                 if save_img:
                     cv2.imwrite(save_path, img_src)
-        
+
         self.inference_logger.on_infer_end()
 
     @staticmethod
