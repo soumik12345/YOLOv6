@@ -21,7 +21,7 @@ class WandbInferenceLogger:
         bbox_data, confidences = [], []
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         height, width, _ = image.shape
-        for *xyxy, confidence, class_id in detection_results:
+        for idx, (*xyxy, confidence, class_id) in enumerate(detection_results):
             confidences.append(float(confidence))
             xyxy = [int(coord) for coord in xyxy]
             bbox_data.append(
@@ -33,7 +33,7 @@ class WandbInferenceLogger:
                         "maxY": xyxy[3] / height,
                     },
                     "class_id": int(class_id),
-                    "box_caption": self.label_dictionary[int(class_id)],
+                    "box_caption": f"Key {idx}: {self.label_dictionary[int(class_id)]} {float(confidence)}",
                     "scores": {"confidence": float(confidence)},
                 }
             )
